@@ -2,6 +2,7 @@ package mini_clienserver;
 
 import java.io.*;
 import java.net.*;
+import java.util.ArrayList;
 
 public class Server {
 
@@ -10,63 +11,28 @@ public class Server {
 	Socket s;
 	DataInputStream dinput;
 	DataOutputStream doutput;
+	boolean shouldRun=true;
 	
+	ArrayList<ServerConnection> connections=new ArrayList();
 	public static void main(String[]args) {
 		new Server();
 	}
 	
 		public Server() {
 	     try {
-	    	 
-			ss=new ServerSocket(8080);
-			s=ss.accept();
-			dinput=new DataInputStream(s.getInputStream());
-			doutput=new DataOutputStream(s.getOutputStream());
-			
-			listenForData();
-			
+	    	ss=new ServerSocket(8080);
+	    	while(shouldRun) {
+				s=ss.accept();
+				ServerConnection sc=new ServerConnection(s,this);
+				sc.start();
+				connections.add(sc);
+	    	}
+	    	
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	     
 	}
-		
-	public void listenForData() {
-		
-		while(true) {
-			try {
-				
-				while(dinput.available()==0) {
-				
-				try {
-					Thread.sleep(1);
-				}
-				catch(Exception ex) {
-				ex.printStackTrace();
-				}
-			   }
-				
-				String dataIn=dinput.readUTF();
-				doutput.writeUTF(dataIn);
-			}
-			catch(Exception ex) {
-				ex.printStackTrace();
-				break;
-			}
-		}
-		
-		try {
-			dinput.close();
-			doutput.close();
-			ss.close();
-			s.close();
-		}
-		catch(Exception ex) {
-			ex.printStackTrace();
-		}
-		
-		
-	}
-	
-
 }
+		
+	

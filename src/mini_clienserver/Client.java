@@ -48,6 +48,7 @@ public class Client {
 		
 		try {
 			doutput.writeUTF(input);
+			doutput.flush();
 			//check for reply from server
 			while(dinput.available()==0) {
 			  
